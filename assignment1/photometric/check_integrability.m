@@ -43,7 +43,7 @@ for it_y = 1 : size(normals,1)
             change_p = p(it_y + 1, it_x) - p(it_y, it_x); 
 
             % the differential in q in the y direction:
-            change_q = q(it_y, it_y + 1) - p(it_y, it_x); 
+            change_q = q(it_y, it_x + 1) - p(it_y, it_x); 
 
             %the squared error between the 2nd differentials:
             SE(it_y, it_x) = (change_p - change_q) ^ 2;

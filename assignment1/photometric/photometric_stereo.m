@@ -19,6 +19,7 @@ disp('Computing surface albedo and normal map...')
 
 disp('Fit done')
 
+figure; imshow(albedo)
 %optionally save the figure 
 path_save = '/home/stephan/Documents/MATLAB/CV/assignment1/images/photometric/';
 str_figure_save = '1_1a_estimation_albedo_5_shadow'; 
@@ -31,6 +32,8 @@ threshold = 0.005;
 SE(SE <= threshold) = NaN; % for good visualization
 fprintf('Number of outliers: %d\n\n', sum(sum(SE > threshold)));
 
+figure; 
+imshow(SE)
 path_save = '/home/stephan/Documents/MATLAB/CV/assignment1/images/photometric/';
 str_figure_save = '1_2_SE_5'; 
 %print(print([path_save, str_figure_save], '-dpng'))
