@@ -1,3 +1,4 @@
+
 % Read given images
 original = imread('ball.png');
 albedo = imread('ball_albedo.png');
