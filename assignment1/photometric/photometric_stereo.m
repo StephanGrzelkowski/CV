@@ -156,9 +156,8 @@ for it_channel = 1 : 3
     show_results(albedo, normals, SE)
 end
 
-
-
 %% Face
+%load in the face data 
 [image_stack, scriptV] = load_face_images('./yaleB02/');
 [h, w, n] = size(image_stack);
 fprintf('Finish loading %d images.\n\n', n);
@@ -174,10 +173,13 @@ SE(SE <= threshold) = NaN; % for good visualization
 fprintf('Number of outliers: %d\n\n', sum(sum(SE > threshold)));
 
 %% compute the surface height
+
+%construct the height map using different methods 
 height_map_col = construct_surface( p, q, 'column' );
 height_map_row= construct_surface( p, q, 'row' );
 height_map_avg = construct_surface( p, q, 'average' );
 
+%show the SE and the height maps 
 show_results(albedo, normals, SE);
 show_model(albedo, height_map_col);
 title('Column major')
