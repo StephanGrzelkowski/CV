@@ -1,21 +1,18 @@
-imOrig = imread('D:\Google accounts\Student account\School\Master AI\Computer Vision 1\Lab assignments\Assignment 1\intrinsic_images\ball.png');
-imAlb = imread('D:\Google accounts\Student account\School\Master AI\Computer Vision 1\Lab assignments\Assignment 1\intrinsic_images\ball_albedo.png');
-imSha = imread('D:\Google accounts\Student account\School\Master AI\Computer Vision 1\Lab assignments\Assignment 1\intrinsic_images\ball_shading.png');
+% Read given images
+original = imread('ball.png');
+albedo = imread('ball_albedo.png');
+shading = imread('ball_shading.png');
 
-newAlb = imAlb;
+% Recolor the ball
+copy = albedo;
 
-% Replace every pixel in the albedo that contains the true material color
-% with pure green.
-for i = 1:size(imAlb, 1)
-    for j = 1:size(imAlb,2)
-        color = squeeze(imAlb(i,j,:));
-        if color == [184, 141, 108]'
-            newAlb(i,j,:) = [0, 255, 0];
-        end
-    end
-end
+copy(copy==184) = 0;
+copy(copy==141) = 255;
+copy(copy==108) = 0;
 
-imRecolored = double(imSha) .* double(newAlb);
+% Reconstruct the ball with recolored albedo and the given shading
+reconstruction = double(copy) .* double(shading);
 
-subplot(1, 2, 1), imshow(imOrig)
-subplot(1, 2, 2), imshow(uint16(imRecolored))
+% Plot the original ball and the recolored ball
+subplot(1,2,1), imshow(original);
+subplot(1,2,2), imshow(uint16(reconstruction));
