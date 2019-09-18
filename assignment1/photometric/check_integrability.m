@@ -38,7 +38,7 @@ q(isnan(q)) = 0;
 % loop over all pixels
 for it_y = 1 : size(normals,1)
     for it_x = 1 : size(normals,2)
-        if (it_x < 512) && (it_y < 512)
+        if (it_x < size(normals,2)) && (it_y < size(normals,1))
             % get the differential in p over the x direction:
             change_p = p(it_y + 1, it_x) - p(it_y, it_x); 
 

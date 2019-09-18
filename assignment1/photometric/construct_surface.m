@@ -80,7 +80,7 @@ function height_map = row_integration(p,q)
 %
 %   height_map: the reconstructed surface
 
-%per allocate
+%pre-allocate
 [h, w] = size(p);
 height_map = zeros(h, w);
 
@@ -90,7 +90,7 @@ for it_c = 1 : w
     if it_c > 1
         height_map(1, it_c) = height_map( 1,it_c - 1) + p(1, it_c);
     end
-    %iterate to downwards (over rows)
+    %iterate to downwards (over rows) adding q values 
     for it_r = 2 : h
         height_map(it_r, it_c) =  height_map(it_r - 1, it_c) + q(it_r - 1, it_c);
     end
