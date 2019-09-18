@@ -36,6 +36,5 @@ else
     return;
 end
 
-visualize(new_image, colorspace, false); % fill in this function %% Set final argument to true to autosave the figure
-
+visualize(new_image, colorspace);  
 end
