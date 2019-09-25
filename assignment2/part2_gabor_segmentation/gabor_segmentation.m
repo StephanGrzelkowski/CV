@@ -214,11 +214,8 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 
-normA = features - min(features(:));
-Nfeatures = normA ./ max(normA(:)); % *
-
-%Nfeatures = normalize(features,'scale','mad');
-%Nfeatures = normalize(features,'center','mean'); % \\ TODO: i)  Implement
+Nfeatures = (features - mean(features))/std(features);
+% \\ TODO: i)  Implement
 %standardization on matrix called features. 
            %          ii) Return the standardized data matrix.
 
