@@ -7,8 +7,8 @@ im_direction = zeros(k, l);
 % Convolute the images with the x and y kernels
 x = [1 0 -1; 2 0 -2; 1 0 -1];
 y = [1 2 1; 0 0 0; -1 -2 -1];
-Gx = imfilter(image, x, 'replicate', 'same');
-Gy = imfilter(image, y, 'replicate', 'same');
+Gx = imfilter(image, x, 'conv');
+Gy = imfilter(image, y, 'conv');
 
 % For each pixel, calculate the magnitude and direction
 for i = 1:k
