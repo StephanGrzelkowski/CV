@@ -187,7 +187,8 @@ features = zeros(numRows, numCols, length(featureMags));
 if smoothingFlag
     for i = 1:length(featureMags)
         gauss = fspecial('gaussian', 3, sigma);
-        features(:,:,jj) = imfilter(featureMags{i}, gauss, 'replicate', 'conv');
+        feat = imfilter(featureMags{i}, gauss, 'replicate', 'conv');
+        features(:,:,i) = feat;
     end
     % \\TODO:
     %FOR_LOOP
@@ -213,15 +214,17 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 
-features = normalize(features) % \\ TODO: i)  Implement standardization on matrix called features. 
+Nfeatures = (features - mean(features))/std(features);
+% \\ TODO: i)  Implement
+%standardization on matrix called features. 
            %          ii) Return the standardized data matrix.
 
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
 % with the pipeline and filterbank.  
-coeff = pca(features);
-feature2DImage = reshape(features*coeff(:,1),numRows,numCols);
+coeff = pca(Nfeatures);
+feature2DImage = reshape(Nfeatures*coeff(:,1),numRows,numCols);
 figure(4)
 imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 
@@ -232,7 +235,7 @@ imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 % \\ Hint-2: use the parameter k defined in the first section when calling
 %            MATLAB's built-in kmeans function.
 tic
-pixLabels = kmeans(features, k);% \\TODO: Return cluster labels per pixel
+pixLabels = kmeans(Nfeatures, k);% \\TODO: Return cluster labels per pixel
 ctime = toc;
 fprintf('Clustering completed in %.3f seconds.\n', ctime);
 
