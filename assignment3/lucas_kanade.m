@@ -6,8 +6,12 @@ lucaskanade(frame1, frame2, 15);
 
 function [optical_flow] = lucaskanade(frame1, frame2, block_size)  
 
+frame1 = rgb2gray(frame1);
+frame2 = rgb2gray(frame2);
+
 % Compute partial derivatives (with a Sobel kernel: combining
-% differentation with smoothing)
+% differentation with smoothing)                     Hey wait, why, there's
+% no noise in our images
 sobel_x = [1 2 1; 0 0 0; -1 -2 -1];
 sobel_y = sobel_x';
 Ix = imfilter(frame1, sobel_x, 'same'); 
@@ -36,8 +40,8 @@ for region = 1:nr_of_regions;
         end
     end
     b = b'; % Turn it into a column vector 
-    A_transpose = A';
-    v = inv(A_transpose * A) * A_transpose * b;
+    v = pinv(A) * b;
+    
 end
 
 

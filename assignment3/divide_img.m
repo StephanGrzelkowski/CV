@@ -1,5 +1,4 @@
 function BLOCKS = divide_img(im,block_size) % im are im_derivatives
-    im = rgb2gray(im);
     s = size(im);
     remx =  mod(s(1),block_size);
     remy =  mod(s(2),block_size);
