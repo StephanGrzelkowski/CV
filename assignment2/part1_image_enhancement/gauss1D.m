@@ -4,9 +4,9 @@ if mod(kernel_size, 2) == 0
 end
 %% solution
 %get the x space
-x = floor(- kernel_size / 2) : 1 : floor(kernel_size /2);
+x = -floor(kernel_size / 2) : 1 : floor(kernel_size /2);
 %calculate the gaussian filter
 G = 1 / (sigma * sqrt(2)) .* exp( (-x.^2) ./ (2*sigma^2));
 %normalize G = 1
-G = G ./ sum(G, [], 'all'); 
+G = G ./ sum(G, 'all'); 
 end

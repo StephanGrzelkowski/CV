@@ -5,5 +5,5 @@ function G = gauss2D( sigma , kernel_size )
     %take the product of the two: 
     G = G1d' * G1d;
     %normalize again
-    G = G ./ sum(G, [], 'all');
+    G = G ./ sum(G, 'all');
 end

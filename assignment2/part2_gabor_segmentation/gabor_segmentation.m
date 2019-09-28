@@ -133,8 +133,9 @@ fprintf('--------------------------------------\n')
 %            explain what works better and why shortly in the report.
 featureMaps = cell(length(gaborFilterBank),1);
 for jj = 1 : length(gaborFilterBank)
-    real_out =  % \\TODO: filter the grayscale input with real part of the Gabor
-    imag_out =  % \\TODO: filter the grayscale input with imaginary part of the Gabor
+    gabor = gaborFilterBank(jj).filterPairs;
+    real_out =  imfilter(img_gray, gabor(:,:,1), 'symmetric', 'conv');% \\TODO: filter the grayscale input with real part of the Gabor
+    imag_out =  imfilter(img_gray, gabor(:,:,2), 'symmetric', 'conv');% \\TODO: filter the grayscale input with imaginary part of the Gabor
     featureMaps{jj} = cat(3, real_out, imag_out);
     
     % Visualize the filter responses if you wish.
@@ -158,7 +159,8 @@ featureMags =  cell(length(gaborFilterBank),1);
 for jj = 1:length(featureMaps)
     real_part = featureMaps{jj}(:,:,1);
     imag_part = featureMaps{jj}(:,:,2);
-    featureMags{jj} = % \\TODO: Compute the magnitude here
+    test = sqrt(double(real_part).^2 + double(imag_part).^2);
+    featureMags{jj} = test; % \\TODO: Compute the magnitude here
     
     % Visualize the magnitude response if you wish.
     if visFlag
@@ -183,6 +185,11 @@ end
 % \\ Hint: doc imfilter, doc fspecial or doc imgaussfilt.  
 features = zeros(numRows, numCols, length(featureMags));
 if smoothingFlag
+    for i = 1:length(featureMags)
+        gauss = fspecial('gaussian', 3, sigma);
+        feat = imfilter(featureMags{i}, gauss, 'replicate', 'conv');
+        features(:,:,i) = feat;
+    end
     % \\TODO:
     %FOR_LOOP
         % i)  filter the magnitude response with appropriate Gaussian kernels
@@ -196,7 +203,6 @@ else
     end
 end
 
-
 % Reshape the filter outputs (i.e. tensor called features) of size 
 % [numRows, numCols, numFilters] into a matrix of size [numRows*numCols, numFilters]
 % This will constitute our data matrix which represents each pixel in the 
@@ -208,15 +214,17 @@ features = reshape(features, numRows * numCols, []);
 % \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing
 %          for more information. \\
 
-features = % \\ TODO: i)  Implement standardization on matrix called features. 
+Nfeatures = (features - mean(features))/std(features);
+% \\ TODO: i)  Implement
+%standardization on matrix called features. 
            %          ii) Return the standardized data matrix.
 
 
 % (Optional) Visualize the saliency map using the first principal component 
 % of the features matrix. It will be useful to diagnose possible problems 
 % with the pipeline and filterbank.  
-coeff = pca(features);
-feature2DImage = reshape(features*coeff(:,1),numRows,numCols);
+coeff = pca(Nfeatures);
+feature2DImage = reshape(Nfeatures*coeff(:,1),numRows,numCols);
 figure(4)
 imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 
@@ -227,7 +235,7 @@ imshow(feature2DImage,[]), title('Pixel representation projected onto first PC')
 % \\ Hint-2: use the parameter k defined in the first section when calling
 %            MATLAB's built-in kmeans function.
 tic
-pixLabels = % \\TODO: Return cluster labels per pixel
+pixLabels = kmeans(Nfeatures, k);% \\TODO: Return cluster labels per pixel
 ctime = toc;
 fprintf('Clustering completed in %.3f seconds.\n', ctime);
 
