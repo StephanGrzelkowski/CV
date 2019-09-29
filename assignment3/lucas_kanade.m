@@ -6,19 +6,18 @@ lucaskanade(frame1, frame2, 15);
 
 function [optical_flow] = lucaskanade(frame1, frame2, block_size)  
 
-% Compute partial derivatives (with a Sobel kernel: combining
-% differentation with smoothing)
-sobel_x = [1 2 1; 0 0 0; -1 -2 -1];
-sobel_y = sobel_x';
-Ix = imfilter(frame1, sobel_x, 'same'); 
-Iy = imfilter(frame1, sobel_y, 'same');
+frame1 = rgb2gray(frame1);
+frame2 = rgb2gray(frame2);
 
-% Compute the differentiated difference in intensity between one frame and previous frame
-simple_derivative_filter = [1 -1];   % Not sure about this filter
-temp = imfilter(frame2-frame1, simple_derivative_filter, 'replicate');
-It = imfilter(temp, simple_derivative_filter', 'replicate');
+% Compute partial derivatives (with simple derivative filters, smoothing is
+% not needed given the clean frames provided to us in this assignment)
+Ix = imfilter(frame1, [-1 1; -1 1], 'same'); 
+Iy = imfilter(frame1, [-1 -1; 1 1], 'same');
 
-% Divide frames into non-overlapping regions
+% Compute the difference in intensity between a frame and previous frame
+It = frame2 - frame1;
+
+% Divide maps of Intensity derivatives and It into non-overlapping regions
 Ix_blocks = divide_img(Ix, block_size);
 Iy_blocks = divide_img(Iy, block_size);  
 It_blocks = divide_img(It, block_size);
@@ -35,11 +34,12 @@ for region = 1:nr_of_regions;
             index = index + 1;
         end
     end
-    b = b'; % Turn it into a column vector 
-    A_transpose = A';
-    v = inv(A_transpose * A) * A_transpose * b;
-end
+    b = double(b); % Otherwise it throws errors 
+    v = pinv(double(A))* b' % Transpose the b vector, then compute the optical flow vector for this region
 
+    % TO-DO (for Stephan): store all these v's into an array or sth to make it easy to
+    % plot with quiver
+end
 
 end
 
