@@ -4,7 +4,7 @@ frame1 = imread('sphere1.ppm');
 frame2 = imread('sphere2.ppm');
 lucaskanade(frame1, frame2, 15);
 
-function [optical_flow] = lucaskanade(frame1, frame2, block_size)  
+function [mat_flow_vectors] = lucaskanade(frame1, frame2, block_size)  
 
 frame1 = rgb2gray(frame1);
 frame2 = rgb2gray(frame2);
@@ -24,10 +24,11 @@ It_blocks = divide_img(It, block_size);
 nr_of_regions = size(Ix_blocks, 3);
 
 % For each region, compute A, transpose(A), b (see assignment)
-for region = 1:nr_of_regions;
+mat_flow_vectors = nan(nr_of_regions, 2);
+for region = 1:nr_of_regions
     index = 1;
-    for row = 1:block_size;
-        for col = 1:block_size;   
+    for row = 1:block_size
+        for col = 1:block_size   
             A(index, 1) = Ix_blocks(row, col, region); 
             A(index, 2) = Iy_blocks(row, col, region);
             b(index) = -It_blocks(row, col, region);
@@ -35,12 +36,12 @@ for region = 1:nr_of_regions;
         end
     end
     b = double(b); % Otherwise it throws errors 
-    v = pinv(double(A))* b' % Transpose the b vector, then compute the optical flow vector for this region
+    v = pinv(double(A))* b'; % Transpose the b vector, then compute the optical flow vector for this region
 
     % TO-DO (for Stephan): store all these v's into an array or sth to make it easy to
-    % plot with quiver
+    mat_flow_vectors(region, :) = v;
 end
-
+% plot with quiver
 end
 
 
