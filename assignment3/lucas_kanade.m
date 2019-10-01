@@ -1,5 +1,5 @@
 function [mat_flow_vectors, X, Y] = lucas_kanade(frame1, frame2, block_size)  
-
+% 
 % Compute partial derivatives (with simple derivative filters, smoothing is
 % not needed given the clean frames provided to us in this assignment)
 Ix = imfilter(frame1, [-1 1], 'same'); 
