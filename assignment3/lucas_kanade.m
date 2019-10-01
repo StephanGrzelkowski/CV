@@ -1,10 +1,4 @@
-% frame1 = double(imread('synth1.pgm'));
-% frame2 = double(imread('synth2.pgm'));
-frame1 = double(rgb2gray(imread('sphere1.ppm')));
-frame2 = double(rgb2gray(imread('sphere2.ppm')));
-lucaskanade(frame1, frame2, 15);
-
-function [mat_flow_vectors] = lucaskanade(frame1, frame2, block_size)  
+function [mat_flow_vectors, X, Y] = lucas_kanade(frame1, frame2, block_size)  
 
 % Compute partial derivatives (with simple derivative filters, smoothing is
 % not needed given the clean frames provided to us in this assignment)
@@ -39,12 +33,7 @@ for region = 1:nr_of_regions
 
     mat_flow_vectors(region, :) = v;
 end
-figure;
-imshow(frame1./255)
-hold on
-%after centering the x and y in the center of the rectangles plot the
-%quiver
-quiver(reshape(X,[],1)+6,reshape(Y,[],1)+6,mat_flow_vectors(:,1),mat_flow_vectors(:,2))
+
 end
 
 
