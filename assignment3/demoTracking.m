@@ -1,4 +1,8 @@
 % This script runs the demo of the optical flow video creation 
+
+%run from assignment folder
+
+
 %% toy person images
 
 %data folder
