@@ -1,4 +1,4 @@
-function [matches, scores] = keypoint_matching(img1, img2)
+function [matches, scores, f1, f2] = keypoint_matching(img1, img2)
 
 
 %do sift n each image
