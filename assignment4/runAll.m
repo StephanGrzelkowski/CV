@@ -2,50 +2,34 @@
 img1 = single(imread('boat1.pgm'));
 img2 = single(imread('boat2.pgm'));
 
+%% do keypoint matching
+[matches, scores, f1, f2] = keypoint_matching(img1, img2);
 
+%select a random number of points to plot
+idcs_rand = randi(length(scores), 10, 1); 
 
-%% do keypoint matching 
-%do sift n each image
-[f1,d1] = vl_sift(img1);
-[f2,d2] = vl_sift(img2);
+%stitch the image columns for visualization;
+img_stitched = [img1 , img2];
 
-%keypoint matching
-[matches, scores] = vl_ubcmatch(d1, d2);
-%% ransac
-N=2
-P = 10
+%get the position of the feature points
+xy_f1 = f1(1:2, matches(1, idcs_rand));
+xy_f2 = f2(1:2, matches(2, idcs_rand)); 
+
+%add to the second image on the x so the position reflects the image in the
+%stitching
+xy_f2(1,:) = xy_f2(1, :) + size(img1, 2);
+
+%plot the images
+figure;
+imshow(img_stitched./255);
+hold on
+scatter(xy_f1(1, :), xy_f1(2,:), 'g', 'LineWidth', 2)
+scatter(xy_f2(1, :), xy_f2(2,:), 'r', 'LineWidth', 2)
+for it = 1 : size(xy_f1, 2)
+    line([xy_f1(1, it), xy_f2(1, it)], [xy_f1(2,it), xy_f2(2,it)], 'LineWidth', 2)
+end
+%% RANSAC (Work in progress)
+N = 3;
+P = 10;
+RANSAC(matches, f1, f2, N, P, img1, img2)
  
-for iteration = 1:N 
-    random_subset = randperm(size(matches, 2), P);
-    columns = matches(:, random_subset);
-    xa_all = f1(1, columns);
-
-    xb_all = f2(1, columns);
-
-    ya_all = f1(2, columns);
-
-    yb_all = f2(2,  columns);
-    
-    for i = 1:P
-        A = [xa_all(i) ya_all(i) 0 0 1 0; 0 0 xa_all(i) ya_all(i) 0 1];
-        b = [xb_all(i); yb_all(i)];
-        x = pinv(A)*b;  % compute x, the transformation params
-    end
-    ms = x'(:4).reshape(2,2)
-    ts = x'(5:)
-     
-   
-    transformed_im1 = ms * [xa_all; ya_all] + ts
-    
-    % Plot sth, but not sure yet what. TODO: find out
-    subplot(2,1,1), imshow(...);
-    subplot(2,1,2), imshow(...);
-      % or do we want to savefigs instead?
-
-    inliers_count = 0
-    if inliers_count > max(inliers_scores)
-        transformation_params = cat(1, transformation_params, x) % TODO: doublecheck dimension to concatenate
-        inliers_set = cat(1, inliers_set, inliers_count) % TODO: idem
-    else
-
-    end 

@@ -1,12 +1,13 @@
-function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, im1, im2) % TODO: check that this is the right output and input
+function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img1, img2) % TODO: check that this is the right output and input
 % N = number of iterations
 % P = nr of matches to randomly select from the total set of matching points
 
-% Might not needs these lists, lets see
-inliers_scores = [];
-transformation_params = [];
-inliers_set = [];
+inliers_scores = 0; 
+inliers_indices = []; 
+best_params = 0; 
 
+% Calculating the transformation matrix x for N iterations, each iteration
+% uses a different sample of the matches
 for iteration = 1:N  
     random_subset = randperm(size(matches, 2), P); % indices of subset of matches
     columns = matches(:, random_subset); % actual subset of matches
@@ -25,20 +26,58 @@ for iteration = 1:N
     ms = reshape(x_transposed(1:4), [2,2]);
     ts = x(5:end);
       
-    transformed_matchingpoints_img1 = ms * [matches(1,:); matches(2,:)] + ts;
+    % Try transforming image 1 with the params found in this iteration
+    transformed_matchingpoints_img1 = ms * [f1(1,matches(1,:)); f1(matches(2,:))] + ts;
     
-    % TODO: plot as instructed (With lines from transformed points to im2)
-%     subplot(3,1,1), imshow(im1);
-%     subplot(3,1,2), imshow(transformed_matchingpoints_img1);
-%     subplot(3,1,3), imshow(im2);
-    % Maybe only plot/save that image in 1st iteration? We still need to do
-    % more iterations and find the best params! Oddly structured assignment
-     
-    %TODO: think about how to calculate inliers when I'm more awake
-    inliers_count = 0;
-    if inliers_count > max(inliers_scores)
-        transformation_params = cat(1, transformation_params, x); % TODO: doublecheck dimension to concatenate
-        inliers_set = cat(1, inliers_set, inliers_count); % TODO: idem
+    % Evaluate the quality of this iteration's transformation matrix by
+    % calcuating nr. of inliers and comparing it with previous iterations'
+    % transformation matrices
+    xy_f2 = f2(1:2, matches(2,:));
+    inliers_count = 0
+    inliers_index = []; % initialize a list of indices of inlier points
+    for point = 1:size(transformed_matchingpoints_img1, 2)
+        distance = norm(xy_f2(:,point)-transformed_matchingpoints_img1(:,point)); % TODO: this is probably not the way
+        if distance < 10; 
+            inliers_count = inliers_count + 1;
+            inliers_index = cat(2, inliers_index, point); % save the indices of the matching points that are inliers
+        end
     end
-    % TODO: Add some line that returns the best transformation after N iterations
+    
+    if inliers_count > max(inliers_scores)
+        inliers_scores = cat(1, inliers_scores, inliers_count);
+        %inliers_indices = cat(1, inliers_indices, inliers_index);
+        %commenting this because otherwise it'll break, but also not ssure
+        %why we're told to save inliers...
+        best_params = x ;
+    end
+     
+    % Transform image 1 with best_params (using a helper function
+    
+    
+    % TODO: plot as instructed (bullet point between hint and instructions
+    % about inliers)
+    % Maybe only plot/save that image in 1st iteration? 
+    
+    % stitch the image columns for visualization;
+%     img_stitched = [img1 , img2];
+% 
+%     %get the position of the feature points
+%     xy_f1 = f1(1:2, matches(1, columns));
+%     xy_f1_transformed = f1(1:2, matches(1, columns));
+%     xy_f2 = f2(1:2, matches(2, columns)); 
+% 
+%     %add to the second image on the x so the position reflects the image in the
+%     %stitching
+%     xy_f2(1,:) = xy_f2(1, :) + size(img1, 2);
+% 
+%     %plot the images
+%     figure;
+%     imshow(img_stitched./255);
+%     hold on
+%     scatter(xy_f1(1, :), xy_f1(2,:), 'g', 'LineWidth', 2)
+%     scatter(xy_f2(1, :), xy_f2(2,:), 'r', 'LineWidth', 2)
+%     for it = 1 : size(xy_f1, 2)
+%         line([xy_f1(1, it), xy_f2(1, it)], [xy_f1(2,it), xy_f2(2,it)], 'LineWidth', 2)
+%     end
+
 end
