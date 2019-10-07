@@ -19,7 +19,7 @@ xy_f2 = f2(1:2, matches(2, idcs_rand));
 %stitching
 xy_f2(1,:) = xy_f2(1, :) + size(img1, 2);
 
-%plot the images
+% plot the images
 figure;
 imshow(img_stitched./255);
 hold on
@@ -28,8 +28,20 @@ scatter(xy_f2(1, :), xy_f2(2,:), 'r', 'LineWidth', 2)
 for it = 1 : size(xy_f1, 2)
     line([xy_f1(1, it), xy_f2(1, it)], [xy_f1(2,it), xy_f2(2,it)], 'LineWidth', 2)
 end
+
 %% RANSAC (Work in progress)
-N = 3;
+N = 1000;
 P = 10;
-RANSAC(matches, f1, f2, N, P, img1, img2)
- 
+
+transformation = RANSAC(matches, f1, f2, N, P);
+
+new_img = size(img1);
+[x,y] = size(img1);
+for i = 1:x
+    for j = 1:y
+        new_cords = round(transformation * [i,j,1]'); 
+        new_img(new_cords(1), new_cords(2)) = img1(i, j);
+    end
+end
+
+
