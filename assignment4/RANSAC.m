@@ -1,9 +1,12 @@
-function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img_stitched)
+function [ best_transformation_params, best_matches ] = RANSAC(matches, f1, f2, N, P, img_stitched)
     % N = number of iterations
     % P = nr of matches to randomly select from the total set of matching points
+    
+    best_inliers = 0;
+    best_transformation_params = [];
+    best_matches= [];
     for iteration = 1:N
-        best_inliers = 0;
-        best_transformation = [];
+        
 
         % Shuffle matches and select the first P
         shuf_match = matches(:, randperm(size(matches,2)));
@@ -45,7 +48,8 @@ function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img_stitched)
         inliers = length(row);
         if inliers >= best_inliers
             best_inliers = inliers;
-            best_transformation = [m(1,1) m(1,2) t(1); m(2,1) m(2,2) t(2); 0,0 1];
+            best_transformation_params = [m(1,1) m(1,2) t(1); m(2,1) m(2,2) t(2); 0,0 1];
+            best_matches = subset;
         end
 
     end
@@ -58,6 +62,5 @@ function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img_stitched)
 %     scatter(XYP(1, 1:10), XYP(2,1:10), 'r', 'LineWidth', 2)
 %     for it = 1 : 10
 %     line([xy_f1(1, it), XYP(1, it)], [xy_f1(2,it), XYP(2,it)], 'LineWidth', 1)
-%     end
-
+%     end 
 end
