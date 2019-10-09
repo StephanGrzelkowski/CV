@@ -40,5 +40,4 @@ nn(50+s1(1)-diffy: 49+s1(1)-diffy+s2(1), s1(2) - diffx+1:  s1(2) - diffx+s2(2))=
 % n1(dif1(1)+1:dif1(1)+s1(1),dif1(2)+1:dif1(2)+s1(2)) = im1;
 % n2(dif2(1)+1:dif2(1)+s2(1),dif2(2)+1:dif2(2)+s2(2)) = zz;
 stitched = nn;
-
 end
