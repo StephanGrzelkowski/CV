@@ -1,6 +1,4 @@
 function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img_stitched)
-
-
     % N = number of iterations
     % P = nr of matches to randomly select from the total set of matching points
     for iteration = 1:N
