@@ -43,9 +43,9 @@ function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img_stitched)
         % Calculate inliers
         [row,col] = find(distances < 10);
         inliers = length(row);
-        if inliers > best_inliers
+        if inliers >= best_inliers
             best_inliers = inliers;
-            best_transformation = [m(1,1) m(1,2) 0; m(2,1) m(2,2) 0; t' 1];
+            best_transformation = [m(1,1) m(1,2) t(1); m(2,1) m(2,2) t(2); 0,0 1];
         end
 
     end

@@ -38,12 +38,12 @@ N = 10;
 P = 10;
 
 best_t = RANSAC(matches, f1, f2, N, P, img_stitched);
-% tform = affine2d(best_t);
+% tform = affine2d(best_t');
 % transform_img = imwarp(img1, tform, 'nearest');
 % imshow(uint8(transform_img));
 
-transform_img1 = myAffine(image, A, M, N, method);
-transform_img2 = myAffine(image, A, M, N,);
+transform_img1 = affine(img1, best_t);
+transform_img2 = affine(img2, best_t);
 
 subplot(1,2,1)
 imshow(uint8(transform_img1))

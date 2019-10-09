@@ -1,4 +1,5 @@
-function [rotatedImage] = myAffine(image, A, M, N, method)
+function [rotatedImage] = myAffine(image, A)
+    [M, N] = size(image);
     % calculate X ( insert code for this )
     B = [ 1 1; 1 N; M 1]';
     X = B / A;
@@ -10,6 +11,9 @@ function [rotatedImage] = myAffine(image, A, M, N, method)
     XcoordNew = c(1,:);
     YcoordNew = c(2,:);
     
-    new = arrayfun(@(y,x) pixelValue(image,x,y,method),XcoordNew,YcoordNew);
+    pixelValue(image, x, y)
+    new = arrayfun(@(y,x) pixelValue(image,x,y),XcoordNew,YcoordNew);
     rotatedImage = reshape(new,[M,N]);
+    p=1;
+    
 end
