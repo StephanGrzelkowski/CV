@@ -36,6 +36,16 @@ nn(1:s1(1),1:s1(2)) = im1;
 nn(1+s1(1)-diffy: s1(1)-diffy+s2(1), s1(2) - diffx+1:  s1(2) - diffx+s2(2))= tformedIm;
 
 
+%fix the right edge 
+vec_col = ones(size(nn, 1), 1);
+cur_col = 1;
+%loop through columns until there is one that has pure 0's 
+while sum(vec_col) > 0 
+    vec_col = nn(:, cur_col);
+    cur_col = cur_col + 1; 
+end
+nn = nn(:, 1 : cur_col-1); 
+
 stitched = nn;
 
 end
