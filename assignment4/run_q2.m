@@ -1,6 +1,6 @@
 close all
 
-%% load images
+% read the images
 img1 = single(rgb2gray(imread('left.jpg')));
 img2 = single(rgb2gray(imread('right.jpg')));
 
@@ -17,6 +17,7 @@ N = 30;
 %number of points for ransac
 P = 10; 
 a=stitch(img1,img2, N, P);
+
 figure;
 imshow(uint8(a))
 hold on
