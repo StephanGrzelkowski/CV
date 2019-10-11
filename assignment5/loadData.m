@@ -8,10 +8,14 @@ data = load(['./stl10_matlab/' , type , '.mat']);
 classes = [1, 2, 9, 7, 3];
 indexes = ismember(data.y, classes);
 y = data.y(indexes);
-x = data.X(indexes, :);
+x_vec = data.X(indexes, :);
 
 % Shuffle the image order
 idx = randperm(length(y));
 y = y(idx(1:N));
-x = x(idx(1:N));
+x = nan(96,96,3,N); 
+for it = 1 : N
+    
+    x(:,:,:,it) = reshape(squeeze(x_vec(idx(it), :)), 96, 96, 3);
+end
 end
