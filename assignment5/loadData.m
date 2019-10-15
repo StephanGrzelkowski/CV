@@ -18,4 +18,5 @@ for it = 1 : N
     
     x(:,:,:,it) = reshape(squeeze(x_vec(idx(it), :)), 96, 96, 3);
 end
+
 end
