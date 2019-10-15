@@ -1,77 +1,66 @@
-function [ best_transformation ] = RANSAC(matches, f1, f2, N, P, img1, img2) % TODO: check that this is the right output and input
-% N = number of iterations
-% P = nr of matches to randomly select from the total set of matching points
+function [ best_transformation_params, best_matches ] = RANSAC(matches, f1, f2, N, P, img_stitched)
+    % N = number of iterations
+    % P = nr of matches to randomly select from the total set of matching points
+    
+    best_inliers = 0;
+    best_transformation_params = [];
+    best_matches= [];
+    for iteration = 1:N
+        
 
-% Initialize some stuff we might need later 
-inliers_scores = 0; 
-inliers_indices = []; 
-best_params = 0; 
+        % Shuffle matches and select the first P
+        shuf_match = matches(:, randperm(size(matches,2)));
+        subset = shuf_match(:, (1:P));
 
-% Calculating the transformation matrix x for N iterations, each iteration
-% uses a different sample of the matches
-for iteration = 1:N  
-    rand_indices = randperm(size(matches, 2), P)'; % indices of subset of matches
-    subset_matches = matches(:, rand_indices); % actual subset of matches
-    x_f1 = f1(1, subset_matches(1,:));
-    x_f2 = f2(1, subset_matches(2,:));
-    y_f1 = f1(2, subset_matches(1,:));
-    y_f2 = f2(2,  subset_matches(2,:));
-    
-    for i = 1:P
-        A = [x_f1(i) y_f1(i) 0 0 1 0; 0 0 x_f1(i) y_f1(i) 0 1];
-        b = [x_f2(i); y_f2(i)];
-    end
-    x = pinv(A)*b; % compute x, the transformation params, I believe it should be outside the small loop above
-    x_transposed = x';
-    m_params = reshape(x_transposed(1:4), [2,2]); % extract components of transformation matrix
-    t_params = x(5:end);
-       
-    % Try transforming all T points in image 1 with the params found in this iteration
-    f1_copy = f1;
-    transf_T_im1 = m_params * [f1_copy(1, matches(1,:)); f1_copy(2, matches(1,:))] + t_params;
-    
-    
-    %%% Now we will visualize how good these params are: plot lines between
-    %%% the T points in image 1 (left) and the transformations thereof on
-    %%% top of image 2 (right) 
-    
-    % Original coordinates of im1's T points
-    xy_f1 = f1(1:2, matches(1, :));
-    
-    % add to the second image on the x so the position reflects the image in the
-    transf_T_im1(1,:) = transf_T_im1(1, :) + size(img1, 2);
+        xy_subset = f1((1:2), subset(1,:));
+        xyp_subset = f2((1:2), subset(2,:));
 
-    stitched_img = [img1, img2];
-    figure;
-    imshow(stitched_img./255);
-    hold on     
-    scatter(xy_f1(1, rand_indices), xy_f1(2, rand_indices), 'g', 'LineWidth', 2)
-    scatter(transf_T_im1(1, rand_indices), transf_T_im1(2, rand_indices), 'r', 'LineWidth', 2)
-    for it = 1 : length(rand_indices)
-        i = rand_indices(it)
-        line([xy_f1(1, i), transf_T_im1(1, i)], [xy_f1(2,i), transf_T_im1(2,i)], 'LineWidth', 2)
-    end
+        A = zeros(2*P, 6);
+        b = zeros(2*P, 1);
 
-    %%%    We can also evaluate the quality of this iteration's transformation matrix by
-    % calcuating nr. of inliers and comparing it with previous iteration. The params that give the largest nr of inliers are the best %%%
-    f2_xy = f2(1:2, matches(2,:));
-    inliers_count = 0;
-    inliers_index = []; % initialize a list of indices of inlier points
-    for point = 1:size(transf_T_im1, 2)
-        distance = norm(f2_xy(:,point)-transf_T_im1(:,point)); % TODO: this is probably not the way
-        if distance < 10;  
-            inliers_count = inliers_count + 1;
-            inliers_index = cat(2, inliers_index, point); % save the indices of the matching points that are inliers
+        for i = 1:P
+            a = [xy_subset(1, i) xy_subset(2, i) 0 0 1 0; 0 0 xy_subset(1, i) xy_subset(2, i) 0 1];
+            A((2*i-1: 2*i), :) = a;
+            b = [xyp_subset(1, i); xyp_subset(2, i)];
+            B((2*i-1: 2*i), :) = b;
         end
+
+        params = pinv(A)*B;
+        m = reshape(params(1:4,:),[2,2])';
+        t = params(5:end);
+
+        xy_f1 = f1((1:2), matches(1,:));
+        XY_f1 = zeros(2*size(matches,2), 6);
+        for i = 1:size(matches, 2)
+            XY_f1((2*i-1: 2*i), :) = [xy_f1(1, i) xy_f1(2, i) 0 0 1 0; 0 0 xy_f1(1, i) xy_f1(2, i) 0 1];
+        end
+        
+        % Calculate the transformation
+        XYP = XY_f1 * params;
+        XYP = reshape(XYP, [2, size(matches,2)]);
+        
+        % Calculate distance
+        xy_f2 = f2((1:2), matches(2,:));
+        distances = vecnorm(xy_f2 - XYP,2);
+
+        % Calculate inliers
+        [row,col] = find(distances < 10);
+        inliers = length(row);
+        if inliers >= best_inliers
+            best_inliers = inliers;
+            best_transformation_params = [m(1,1) m(1,2) t(1); m(2,1) m(2,2) t(2); 0,0 1];
+            best_matches = subset;
+        end
+
     end
-    
-    if inliers_count > max(inliers_scores)
-        inliers_scores = cat(1, inliers_scores, inliers_count);
-        %inliers_indices = cat(1, inliers_indices, inliers_index);
-        %commenting this because otherwise it'll break, but also not ssure
-        %why we're told to save inliers...
-        best_params = x ;
-    end
-     
-    % Transform image 1 with best_params (using a helper function
+%     % plot the image
+%     XYP(1,:) = XYP(1, :) + size(img_stitched, 2)/2;
+%     figure;
+%     imshow(img_stitched./255);
+%     hold on
+%     scatter(xy_f1(1, 1:10), xy_f1(2,1:10), 'g', 'LineWidth', 2)
+%     scatter(XYP(1, 1:10), XYP(2,1:10), 'r', 'LineWidth', 2)
+%     for it = 1 : 10
+%     line([xy_f1(1, it), XYP(1, it)], [xy_f1(2,it), XYP(2,it)], 'LineWidth', 1)
+%     end 
 end
