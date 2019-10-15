@@ -14,8 +14,11 @@ if strcmp(version,  'gray')
         end
         Idx = knnsearch(visual_dictionary', d'); % Assign each descriptor of the image to the nearest visual word and return the index of that visual word 
         edges = 0 : 1 : n_clusters;
-        [counts, edges]= histcounts(Idx, edges); 
+        [counts, ~]= histcounts(Idx, edges); 
 
+        %normalize counts 
+        counts = counts ./ sum(counts);
+        
         % Create a full histogram representation for the image and add it
         % to the array of histograms, which is returned at the end
         images_histograms = cat(1, images_histograms, counts);
