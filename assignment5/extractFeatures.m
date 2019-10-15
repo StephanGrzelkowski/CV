@@ -11,7 +11,7 @@ for n = 1:size(images, 4)
     image = images(:, :, :, n);
     image = single(rgb2gray(image));
     [f, d] = vl_sift(image); 
-    feature_descriptor_matrix = cat(1, feature_descriptor_matrix, d'); % Add feature descriptors extract from this image to the bag of all feature descriptors
+    feature_descriptor_matrix = cat(1, feature_descriptor_matrix, d'); % Add feature descriptors extracted from this image to the bag of all feature descriptors
 end
 end
 

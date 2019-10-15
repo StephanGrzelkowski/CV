@@ -1,5 +1,4 @@
 *.m~
 *.asv
+assignment/vlfeat/
 *.swp
-assignment4/vlfeat*
-assignment5/stl10_matlab/
