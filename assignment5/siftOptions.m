@@ -5,7 +5,10 @@ cur_image = single(cur_image);
 %gray or rgb
 switch opt_gray
     case 'rgb'
-    [f,d] = siftRGB(cur_image, opt_dense);
+    [f,d] = multichannelSIFT(cur_image, opt_dense);
+    case 'oppo'
+    cur_image = rgb2opponent(cur_image);
+    [f, d] = multichannelSIFT(cur_image, opt_dense);
     case 'gray'
     cur_image = rgb2gray(cur_image);
     [f, d] = siftDense(cur_image, opt_dense);
@@ -14,7 +17,7 @@ switch opt_gray
 end
 end
 
-function [f, d] = siftRGB(image, opt_dense)
+function [f, d] = multichannelSIFT(image, opt_dense)
 %this function computes the sift descriptors for each channel and returns
 %concatenated features
 
@@ -29,6 +32,7 @@ for it = 1 : size(image, 3)
 end
 
 end
+
 
 function [f, d] = siftDense(cur_image, opt_dense)
 switch opt_dense
