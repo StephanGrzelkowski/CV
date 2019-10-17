@@ -1,8 +1,6 @@
-function images_histograms = represent_by_histograms(images, visual_dictionary, opt_gray, opt_sift)
+function images_histograms = represent_by_histograms(images, visual_dictionary, opt_gray, opt_sift, n_clusters)
 % For each of the training images, features are extracted, which are
 % subsequently assigned to a visual word in visual_dictionary, allowing us to generate a histogram of visual words per image. Histograms for all inputted images are returned.
-
-n_clusters = 40;
 
 images_histograms = [];
 for n = 1:size(images, 4)

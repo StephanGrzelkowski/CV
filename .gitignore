@@ -3,6 +3,7 @@
 *.swp
 assignment4/vlfeat*
 assignment5/stl10_matlab/
+assignment5/libsvm-3.24
 assignment1/
 assignment2/
 assignment3/
