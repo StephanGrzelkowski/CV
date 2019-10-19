@@ -1,8 +1,10 @@
 function [net, info, expdir] = finetune_cnn(varargin)
 
 %% Define options
-run(fullfile(fileparts(mfilename('fullpath')), ...
-    '..', '..', '..', 'matlab', 'vl_setupnn.m')) ;
+%run(fullfile(fileparts(mfilename('fullpath')), ...
+    %'..', '..', '..', 'matlab', 'vl_setupnn.m')) ;
+    
+run('/home/stephan/Documents/MATLAB/MatConvNet/matlab/vl_setupnn.m')
 
 opts.modelType = 'lenet' ;
 [opts, varargin] = vl_argparse(opts, varargin) ;
@@ -20,7 +22,7 @@ opts.train = struct() ;
 opts = vl_argparse(opts, varargin) ;
 if ~isfield(opts.train, 'gpus'), opts.train.gpus = []; end;
 
-opts.train.gpus = [0];
+opts.train.gpus = [];
 
 
 
@@ -33,7 +35,7 @@ net = update_model();
 if exist(opts.imdbPath, 'file')
     imdb = load(opts.imdbPath) ;
 else
-    imdb = getIMDB() ;
+    imdb = getIMDB('../stl10_matlab/') ; %change this one depending on where the STL10 dataset is
     mkdir(opts.expDir) ;
     save(opts.imdbPath, '-struct', 'imdb') ;
 end
@@ -82,8 +84,6 @@ function imdb = getIMDB(path_stl)
 classes = {'airplanes', 'birds', 'ships', 'horses', 'cars'};
 splits = {'train', 'test'};
 
-
-
 %loop through training and test sets
 for it_set = 1 : 2
     cur_set = splits{it_set};
@@ -112,8 +112,8 @@ for it_set = 1 : 2
         %STL-10
         img = reshape(dat.X(cur_idx,:), [96, 96, 3]);
         
-        %write image to data structure
-        cur_data(:,:,:,it) = img;
+        %write image to data structure after norm and data type transf.
+        cur_data(:,:,:,it) = single(img ./ 255);
         
         %get the label
         label = find(ls_labels == dat.y(cur_idx));
@@ -141,7 +141,7 @@ labels = cat(2, labels_sets{1}, labels_sets{2});
 dataMean = mean(data(:, :, :, sets == 1), 4);
 data = bsxfun(@minus, data, dataMean);
 
-imdb.images.data = data ;
+imdb.images.data = single(data);
 imdb.images.labels = single(labels) ;
 imdb.images.set = sets;
 imdb.meta.sets = {'train', 'val'} ;

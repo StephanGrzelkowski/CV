@@ -76,6 +76,11 @@ net.layers{end+1} = struct('type', 'relu') ;
 % NEW_INPUT_SIZE  = X
 % NEW_OUTPUT_SIZE = Y
 
+%this should be from the previous layer right? 
+NEW_INPUT_SIZE = 64;
+%this should just be the number of classes 
+NEW_OUTPUT_SIZE = 5; 
+
 net.layers{end+1} = struct('type', 'conv', ...
                            'weights', {{0.05*randn(1,1,NEW_INPUT_SIZE,NEW_OUTPUT_SIZE, 'single'), zeros(1,NEW_OUTPUT_SIZE,'single')}}, ...
                            'learningRate', .1*lr_new_layers, ...
