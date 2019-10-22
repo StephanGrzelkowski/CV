@@ -1,4 +1,4 @@
-function feature_descriptor_matrix = extractFeatures(images,opt_gray, opt_sift)
+function feature_descriptor_matrix = extractFeatures(images, opt_gray, opt_sift)
 % This function returns features extracted from inputted images. We want/have to
 % do this with vl_sift & vl_dsift for gray & rgb & opponent but for now
 % lets just stick to vl_sift on gray. The reason I gave the function such a generic

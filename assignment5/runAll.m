@@ -8,18 +8,18 @@ opt_dense = 'dense';
 % respectively
 classes = [1, 2, 9, 7, 3];
 
-n_images_train = 100; % number of images to load for training
-n_images_test = 50; % number of images to load for testing
-subset_ratio = 0.4; % max half of all training images
+n_images_train = 200; % number of images to load for training
+n_images_test = 500; % number of images to load for testing
+subset_ratio = 0.2; % max half of all training images
 
 %% Fetch training data and split it in a subset for learning
 % load the data
-data_train = loadData('train', n_images, classes);
-data_test = loadData('test', n_images, classes);
+data_train = loadData('train', n_images_train, classes);
+data_test = loadData('test', n_images_test, classes);
 
 % Split the labels and the images and split the data for the vocab building
 [vocab, x_train, y_train] = splitData(data_train, n_images_train, subset_ratio, classes);
-[~, x_test, y_test] = splitData(data_test, n_images, 0, classes);
+[~, x_test, y_test] = splitData(data_test, n_images_test, 0, classes);
 
 % Show that it works and that we're awesome
 % figure; 
@@ -33,10 +33,9 @@ visual_dictionary = build_visual_vocab(feature_descriptor_matrix, n_clusters); %
 
 %% Encoding Features Using Visual Vocabulary Once & Representing images by frequencies of visual words(Step 2.3 & 2.4 of assignment)
 x_train_hists = represent_by_histograms(x_train, visual_dictionary, opt_rgb, opt_dense, n_clusters);
-
 x_test_hists = represent_by_histograms(x_test, visual_dictionary, opt_rgb, opt_dense, n_clusters);
 
 %% Classification with a SVM (step 2.5)
-model = svmtrain(double(y_train), x_train_hists, '-b 1 -q 1');
-[predicted_label, accuracy, prob_estimates] = svmpredict(double(y_test), x_test_hists, model);
-
+test_data_probs = classificationSVM(x_train_hists, x_test_hists, y_train, y_test, classes);
+%%
+map = meanAveragePrecision(test_data_probs, classes, y_test, n_images_test);
