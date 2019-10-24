@@ -5,6 +5,8 @@
 
 [net, info, expdir] = finetune_cnn();
 
+%%
+save([expdir, '/your_new_model.mat'], 'net')
 %% extract features and train svm
 
 % TODO: Replace the name with the name of your fine-tuned model

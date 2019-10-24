@@ -103,7 +103,7 @@ for it_set = 1 : 2
     idcs_target_images = find(ismember(dat.y, ls_labels));
     
     %preappend for speed
-    cur_data = nan(96, 96, 3, length(idcs_target_images));
+    cur_data = nan(32,32, 3, length(idcs_target_images));
     cur_labels = nan(1, length(idcs_target_images));
     
     for it = 1 : size(idcs_target_images, 1)
@@ -111,6 +111,9 @@ for it_set = 1 : 2
         %don't know why it says 32 in the comment above should be 96 if we're still working with
         %STL-10
         img = reshape(dat.X(cur_idx,:), [96, 96, 3]);
+        
+        %resize the image 
+        img = imresize(img,1/3);
         
         %write image to data structure after norm and data type transf.
         cur_data(:,:,:,it) = single(img ./ 255);
