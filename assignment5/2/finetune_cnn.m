@@ -1,4 +1,4 @@
-function [net, info, expdir] = finetune_cnn(varargin)
+function [net, info, expdir] = finetune_cnn(batch_size, epochs, varargin)
 
 %% Define options
 %run(fullfile(fileparts(mfilename('fullpath')), ...
@@ -28,7 +28,7 @@ opts.train.gpus = [];
 
 %% update model
 
-net = update_model();
+net = update_model(batch_size, epochs, opts);
 
 %% TODO: Implement getIMDB function below
 
